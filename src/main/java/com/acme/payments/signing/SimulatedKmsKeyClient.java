@@ -19,6 +19,14 @@ public final class SimulatedKmsKeyClient implements KmsKeyClient {
     public SimulatedKmsKeyClient() {
     }
 
+    // NOT MIGRATED - left on RSA. This key is held in KMS custody, which has no
+    // post-quantum signing algorithm to move to yet, and its public key is
+    // depended on by payment-verification-service in a separate repository.
+    // Migrating this site requires the KMS platform team (to provision a new
+    // key once KMS supports one) and the owners of payment-verification-service
+    // (to accept the new key and algorithm) - not a change this repo can make
+    // alone. See MIGRATION_COMPARISON.md.
+
     /** Provisions a new managed key, as if calling KMS CreateKey. Returns only the key id. */
     public String createKey(String keyId) {
         try {

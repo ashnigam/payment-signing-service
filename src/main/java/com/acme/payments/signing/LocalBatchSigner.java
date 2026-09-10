@@ -17,8 +17,10 @@ public class LocalBatchSigner {
 
     public LocalBatchSigner() {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
+            // Migrated to post-quantum: this key is generated and held right here,
+            // with no external custody and no cross-service verifier to coordinate
+            // with, so it's safe to move on its own. ML-DSA-65 replaces RSA.
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("ML-DSA-65");
             this.keyPair = kpg.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -28,7 +30,7 @@ public class LocalBatchSigner {
     public byte[] signBatch(String batchId, String checksum) {
         try {
             String payload = batchId + ":" + checksum;
-            Signature signature = Signature.getInstance("SHA256withRSA");
+            Signature signature = Signature.getInstance("ML-DSA-65");
             signature.initSign(keyPair.getPrivate());
             signature.update(payload.getBytes(StandardCharsets.UTF_8));
             return signature.sign();

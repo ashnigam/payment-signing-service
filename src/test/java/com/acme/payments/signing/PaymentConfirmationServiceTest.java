@@ -31,7 +31,7 @@ class PaymentConfirmationServiceTest {
 
         byte[] sig = service.signNightlyBatch("BATCH-2026-09-10", "abc123");
 
-        Signature verifier = Signature.getInstance("SHA256withRSA");
+        Signature verifier = Signature.getInstance("ML-DSA-65");
         verifier.initVerify(service.batchSigner().publicKey());
         verifier.update("BATCH-2026-09-10:abc123".getBytes());
         assertTrue(verifier.verify(sig));
