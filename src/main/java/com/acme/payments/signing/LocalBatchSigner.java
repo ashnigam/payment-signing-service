@@ -15,12 +15,12 @@ public class LocalBatchSigner {
 
     public byte[] signBatch(String batchId, String checksum) {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
+            // Migrated to post-quantum: ML-DSA-65 replaces RSA everywhere it was found.
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("ML-DSA-65");
             KeyPair keyPair = kpg.generateKeyPair();
 
             String payload = batchId + ":" + checksum;
-            Signature signature = Signature.getInstance("SHA256withRSA");
+            Signature signature = Signature.getInstance("ML-DSA-65");
             signature.initSign(keyPair.getPrivate());
             signature.update(payload.getBytes(StandardCharsets.UTF_8));
             return signature.sign();
