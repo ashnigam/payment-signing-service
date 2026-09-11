@@ -22,8 +22,8 @@ public final class SimulatedKmsKeyClient implements KmsKeyClient {
     /** Provisions a new managed key, as if calling KMS CreateKey. Returns only the key id. */
     public String createKey(String keyId) {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
+            // Migrated to post-quantum: ML-DSA-65 replaces RSA everywhere it was found.
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("ML-DSA-65");
             custody.put(keyId, kpg.generateKeyPair());
             return keyId;
         } catch (NoSuchAlgorithmException e) {
@@ -35,7 +35,7 @@ public final class SimulatedKmsKeyClient implements KmsKeyClient {
     public byte[] sign(String keyId, byte[] message) {
         KeyPair kp = requireKey(keyId);
         try {
-            Signature signature = Signature.getInstance("SHA256withRSA");
+            Signature signature = Signature.getInstance("ML-DSA-65");
             signature.initSign(kp.getPrivate());
             signature.update(message);
             return signature.sign();

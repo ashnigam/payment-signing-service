@@ -16,9 +16,7 @@ class PaymentConfirmationServiceTest {
 
         byte[] sig = service.confirmPayment("PAY-1001", 500_00);
 
-        // This is exactly what payment-verification-service does, in its own repo,
-        // against the public key this signer publishes.
-        Signature verifier = Signature.getInstance("SHA256withRSA");
+        Signature verifier = Signature.getInstance("ML-DSA-65");
         verifier.initVerify(service.confirmationSigner().verificationPublicKey());
         verifier.update("PAY-1001:50000".getBytes());
         assertTrue(verifier.verify(sig));
