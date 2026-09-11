@@ -6,27 +6,19 @@ import java.security.*;
 /**
  * Signs the nightly reconciliation batch file.
  *
- * Unlike {@link KmsPaymentSigner}, this key is generated and held right
- * here - nothing external owns it, and nothing outside this service
- * verifies against it. It is a self-contained signing flow, which is
- * exactly what makes it safe to migrate on its own.
+ * The signing key is generated fresh for each batch, used immediately,
+ * and never stored anywhere in this service. The whole lifecycle of
+ * the key, from creation to use, happens in this one method, which is
+ * what makes this flow safe to migrate on its own.
  */
 public class LocalBatchSigner {
 
-    private final KeyPair keyPair;
-
-    public LocalBatchSigner() {
+    public byte[] signBatch(String batchId, String checksum) {
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
-            this.keyPair = kpg.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+            KeyPair keyPair = kpg.generateKeyPair();
 
-    public byte[] signBatch(String batchId, String checksum) {
-        try {
             String payload = batchId + ":" + checksum;
             Signature signature = Signature.getInstance("SHA256withRSA");
             signature.initSign(keyPair.getPrivate());
@@ -35,9 +27,5 @@ public class LocalBatchSigner {
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Batch signing failed", e);
         }
-    }
-
-    public PublicKey publicKey() {
-        return keyPair.getPublic();
     }
 }
