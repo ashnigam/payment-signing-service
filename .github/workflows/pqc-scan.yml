@@ -1,0 +1,24 @@
+name: PQC Vulnerability Scan
+# Qryptive scans your code for quantum-vulnerable cryptography. It runs in this runner;
+# your code never leaves it.
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  pqc-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PQC Vulnerability Scanner
+        uses: qryptive/pqc-scanner-action@v1
+        with:
+          pqc_scanner_key: ${{ secrets.QRYPTIVE_SCANNER_KEY }}
+          fail_on_vulnerable: "false"   # set to "true" to fail the build on findings
+          scan_scope: all               # "changed" is faster on large repos
+          auto_fix: "false"
