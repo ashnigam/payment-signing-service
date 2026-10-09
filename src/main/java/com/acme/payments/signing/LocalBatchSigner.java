@@ -2,6 +2,7 @@ package com.acme.payments.signing;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import com.acme.payments.signing.pqc.agile.QryptiveCryptoProvider;
 
 /**
  * Signs the nightly reconciliation batch file.
@@ -15,12 +16,12 @@ public class LocalBatchSigner {
 
     public byte[] signBatch(String batchId, String checksum) {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator kpg = QryptiveCryptoProvider.signatureKeyPairGenerator();
             kpg.initialize(2048);
             KeyPair keyPair = kpg.generateKeyPair();
 
             String payload = batchId + ":" + checksum;
-            Signature signature = Signature.getInstance("SHA256withRSA");
+            Signature signature = QryptiveCryptoProvider.signature();
             signature.initSign(keyPair.getPrivate());
             signature.update(payload.getBytes(StandardCharsets.UTF_8));
             return signature.sign();
